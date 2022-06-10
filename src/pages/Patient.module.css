@@ -1,0 +1,33 @@
+.bloc_patient {
+    /* display: flex;
+    justify-content: space-between; */
+    display: grid;
+    grid-template-columns: 1fr 0.5fr;
+}
+
+
+.nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    justify-content:space-between;
+  }
+  
+  .nav li {
+    /* margin-left: 1.5rem; */
+    font-size: 1.25rem;
+  }
+  
+  .nav a {
+    text-decoration: none;
+    color: #88dfdf;
+  }
+  
+  .nav a:hover,
+  .nav a:active,
+  .nav a.active {
+    /* color: #e6fcfc; */
+    color: #16d4d4;
+    font-weight: 700;
+  }

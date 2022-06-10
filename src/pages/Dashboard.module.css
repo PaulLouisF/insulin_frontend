@@ -1,0 +1,13 @@
+/* .dashboard_container {
+    width: 80%;
+    background-color: aqua;
+    margin: auto;
+    padding: 5%
+} */
+
+.dashboard_actionbar {
+    display: flex;
+    justify-content: space-between;
+    /* padding: 40px 0px */
+    margin-bottom: 30px;
+}

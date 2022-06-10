@@ -1,0 +1,17 @@
+.consultation_box_container {
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 0 10px;
+    margin-bottom: 20px
+}
+
+.consultation_box_container_title {
+    margin-top: -30px;
+    padding-left: 10px;
+    background-color: pink;
+    color: white;
+}
+
+.consultation_box_container_title p {
+    margin-bottom: 0px;
+}

@@ -1,0 +1,25 @@
+.legend ul {
+    list-style: none;
+    /* display: flex; */
+    display: grid;
+    grid-template-columns: 0.2fr 1fr 1fr 1fr;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .legend li {
+    /* margin: 1.5rem;  */
+    font-size: 1.25rem;
+  }
+
+  .legend a {
+    text-decoration: none;
+    color: #88dfdf;
+  }
+
+
+
+.pink {
+    background-color: pink;
+}

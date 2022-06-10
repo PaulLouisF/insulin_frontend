@@ -1,0 +1,44 @@
+.ticket_item_container {
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 0 0 10px 0px;
+    margin: 20px 0px
+}
+
+.ticket_item_header {
+    display: grid;
+    grid-template-columns: 0.4fr 2fr 2fr 2fr 1fr;
+    background-color: pink;
+    padding: 0 10px;
+    border-radius: 10px 10px 0 0;
+}
+
+.ticket_header_hospital {
+    display: flex;
+    gap: 10px
+}
+
+.ticket_header_hospital_icon {
+    margin: auto 0px
+}
+
+.ticket_question {
+    padding: 0px 10px
+}
+
+.ticket_answer_form{
+    display: grid;
+    grid-template-columns: 6fr 1fr;
+    gap: 10px
+    /* padding: 0 10px */
+}
+
+.ticket_answer_form textarea{
+    border-radius: 10px;
+    font-size: 1.25rem;
+}
+
+.ticket_answer{
+    padding: 0 10px
+}
+
