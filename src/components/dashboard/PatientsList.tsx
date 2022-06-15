@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 
 import PatientItem from './PatientItem';
 // import PatientsContext from '../../storeEx/patients-context';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import AuthContext from '../../store/auth-context';
 
 import classes from './PatientsList.module.css';
 import { fetchPatientsData } from '../../store/patients-actions';
@@ -12,10 +13,12 @@ const PatientsList = () => {
     // const patientCtx = useContext(PatientsContext);
     const dispatch = useAppDispatch();
     const patients = useAppSelector(selectPatients)
+    const authCtx = useContext(AuthContext);
 
     useEffect(() => {
-      dispatch(fetchPatientsData(''));
+      dispatch(fetchPatientsData('', authCtx.token)); 
     },[dispatch]);
+
 
     return (
         <React.Fragment>    
@@ -31,6 +34,7 @@ const PatientsList = () => {
                 {/* {props.patients && props.patients.map((patient) => { */}
                 {/* {patientCtx.patients && patientCtx.patients.map((patient) => { */}
                 {patients && patients.map((patient) => {
+                    console.log(patient)
                     return (
                         <PatientItem 
                             key={patient.id}

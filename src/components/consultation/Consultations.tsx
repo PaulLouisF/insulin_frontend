@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 
 import ConsultationBox from "./ConsultationBox";
 import NewConsultation from "./NewConsultation";
@@ -9,6 +9,7 @@ import { transformDateLong } from "../../util/function";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { solid, regular } from '@fortawesome/fontawesome-svg-core/import.macro' 
+import AuthContext from "../../store/auth-context";
 
 import classes from './Consultations.module.css';
 
@@ -48,27 +49,29 @@ interface patientObject {
 const Consultations = (props: patientObject) => { //WARNING sur any
     const [isCreateConsultation, setIsCreateConsultation] = useState<boolean>(false);
     // const [isCreateTicket, setIsCreateTicket] = useState<boolean>(false);
-    const [isCreateTicket, setIsCreateTicket] = useState<{openModal: boolean, consultationId: number}>({openModal: false, consultationId: 0});
+    const [isCreateTicket, setIsCreateTicket] = useState<{openModal: boolean, consultationId: null | number}>({openModal: false, consultationId: null });
     // const [consultationId, setConsultationId] = useState<number>();
+    const authCtx = useContext(AuthContext);
+    //const [activeButtonId, setActiveButtonId] = useState<number>(-1);
+    const [error, setError] = useState<any>();
     
     const consultations = props.patient.Consultations.sort(function(a, b) {return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();});
 
     let lastConsultation = <h3>Aucune consultation pour ce patient</h3>
 
-    if(consultations.length > 0) {
-      const timeLastConsultation = (new Date(Date.now()).setHours(0, 0, 0, 0) - new Date(consultations[0].created_at).setHours(0, 0, 0, 0))/(1000* 60 * 60*24)
-      lastConsultation = <h3>La dernière consultation a eu lieu il y a {timeLastConsultation} jours</h3>
-    } 
+    // let lastConsultationId = null;
+    // const [activeButtonId, setActiveButtonId] = useState<null | number>(lastConsultationId)
+    const [activeButtonId, setActiveButtonId] = useState<null | number>(null);
 
-    // useEffect(() => {
-    //   console.log(consultations)
-    //   setActiveButtonId(consultations[0].id)
-    //   console.log(activeButtonId)
-    // }, [])
-
-    const [activeButtonId, setActiveButtonId] = useState<number>(consultations[0].id);
+    useEffect(() => {
+      if(consultations.length > 0) {
+        const timeLastConsultation = (new Date(Date.now()).setHours(0, 0, 0, 0) - new Date(consultations[0].created_at).setHours(0, 0, 0, 0))/(1000* 60 * 60*24)
+        lastConsultation = <h3>La dernière consultation a eu lieu il y a {timeLastConsultation} jours</h3>
+        const lastConsultationId = consultations[0]!.id;
+        setActiveButtonId(lastConsultationId);
+      } 
+    }, [props])
    
-
     const createConsultationHandler = () => {
         setIsCreateConsultation(true);
     };
@@ -79,25 +82,17 @@ const Consultations = (props: patientObject) => { //WARNING sur any
 
     const createTicketHandler = (consultationId: number) => { 
       setIsCreateTicket({openModal: true, consultationId: consultationId}); 
-      // setConsultationId(consultationId);
     };
 
     const closeTicketHandler = () => {
-        setIsCreateTicket({openModal: false, consultationId: 0});
+        setIsCreateTicket({openModal: false, consultationId: null});
     };
 
-    // const transformDate = (date: string) => {
-    //   const formatedDate = new Date(date);
-    //   return formatedDate.toLocaleDateString("fr-FR", { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' });
-    // };
+    const onAddConsultationHandler = async (height: number, weight: number, report: string, patientId: number) => {
 
-    const onAddConsultationHandler = (
-      height: number, 
-      weight: number, 
-      report: string,
-      patientId: number) => {
-
-        fetch(`http://localhost:5000/api/consultations`, {
+        //event.preventDefault(); //WARNING 
+      try {
+        const response = await fetch(process.env.REACT_APP_BACKEND_URL + '/consultations', { 
           method: 'POST',
           body: JSON.stringify({
             height: height,
@@ -106,10 +101,21 @@ const Consultations = (props: patientObject) => { //WARNING sur any
             patient_id: patientId
           }),
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + authCtx.token
           }
         });
-        setIsCreateConsultation(false); //WARNING UNHANDLE if error
+
+        const responseData = await response.json();
+            
+        if (!response.ok) {;
+            throw new Error(responseData.message);
+        }
+        setIsCreateConsultation(false);
+      } catch (err:any) {
+        // throw err;
+        setError(err.message)
+      }
     };
 
 
@@ -117,22 +123,22 @@ const Consultations = (props: patientObject) => { //WARNING sur any
     const onAddTicketHandler = async (enteredQuestion: string, consultationId: number) => {
       //WARNING Set Parameter assignee in Ticket
       try {
-          const response = await fetch(`http://localhost:5000/api/tickets`, {
+          const response = await fetch(process.env.REACT_APP_BACKEND_URL +`/tickets`, {
               method: 'POST',
               body: JSON.stringify({
                 question: enteredQuestion,
                 consultation_id: consultationId,
-                user_id: 2, //WARNING AUTH
               }),
               headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + authCtx.token
               }
           });
-          //WARNING no real management of error
+
           if (!response.ok) {
-              // console.log(responseData)
               throw new Error('Something went wrong');
           }
+          setIsCreateTicket({openModal: false, consultationId: null});
           // navigate(`/patients/${ticket.Consultation.patient_id}}/consultations`, { replace: true });
       } catch (err:any) {
           // throw err;
@@ -207,7 +213,8 @@ const Consultations = (props: patientObject) => { //WARNING sur any
         // for(var i=0; i<consultations.length; i++) {
         //   console.log(refs[consultations[i].id].current.offsetTop)
           // if (window.scrollY < refs[consultations[i].id].current.offsetTop) {
-          if (activeButtonId>=0) { 
+          // if (activeButtonId>=0) { 
+          if (activeButtonId) { 
             const index = arrayConsultationId.findIndex((element) => element = activeButtonId);
             console.log(index)
             if (window.scrollY < refs[activeButtonId].current.offsetTop) {
@@ -241,9 +248,10 @@ const Consultations = (props: patientObject) => { //WARNING sur any
 
     return (
         <Fragment>
-          {isCreateConsultation && <Modal onClose={closeConsultationHandler}><NewConsultation onAddConsultation={onAddConsultationHandler} patientId={props.patient.id}/></Modal>}
-          {isCreateTicket.openModal && <Modal onClose={closeTicketHandler}>
-            <NewTicket onAddTicket={onAddTicketHandler} consultationId={isCreateTicket.consultationId}/>
+          {error && <Modal onClose={() => {setError(null)}}>{error}</Modal>}
+          {isCreateConsultation === true && <Modal onClose={closeConsultationHandler}><NewConsultation onAddConsultation={onAddConsultationHandler} onClose={closeConsultationHandler} patientId={props.patient.id}/></Modal>}
+          {isCreateTicket.openModal && isCreateTicket.consultationId && <Modal onClose={closeTicketHandler}>
+            <NewTicket onAddTicket={onAddTicketHandler} onClose={closeTicketHandler} consultationId={isCreateTicket.consultationId}/>
           </Modal>}
           <div className={classes.consultation_create}>
             {/* <h3>La dernière consultation a eu lieu il y a {timeLastConsultation} jours</h3> */}

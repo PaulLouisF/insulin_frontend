@@ -47,7 +47,7 @@ const PatientsProvider = (props: { children: any }) => {
         const fetchPatients = async () => {
             try {
             const responseData = await fetch(
-              `http://localhost:5000/api/patients`
+                process.env.REACT_APP_BACKEND_URL + `/patients`
             );
             const response = await responseData.json();
             const patients = response.patients;
@@ -66,7 +66,7 @@ const PatientsProvider = (props: { children: any }) => {
     const fetchPatientsHandler = async (filteredName: string) => {
         try {
             const responseData = await fetch(
-              `http://localhost:5000/api/patients`
+                process.env.REACT_APP_BACKEND_URL + `/patients`
             );
             const response = await responseData.json();
             const patients = response.patients;

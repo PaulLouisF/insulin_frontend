@@ -9,6 +9,7 @@ type NewTicketProps = {
         consultationId: number
     ) => void;
     consultationId: number;
+    onClose: () => void
 };
 
 const NewTicket =(props: NewTicketProps) => {
@@ -19,6 +20,10 @@ const NewTicket =(props: NewTicketProps) => {
         const enteredQuestion = questionInputRef.current!.value;
         props.onAddTicket(enteredQuestion, props.consultationId);
     }
+
+    const closeTicketForm = () => {
+        props.onClose();
+    }
     
     return(
         <Fragment>
@@ -28,7 +33,8 @@ const NewTicket =(props: NewTicketProps) => {
                     <label htmlFor='question'>Question</label>
                     <textarea rows={3} id='question' ref={questionInputRef}/>
                 </div>                
-                <Button type="submit">Créer</Button>  
+                <Button type="submit">Valider</Button> 
+                <Button type="button" onClick={closeTicketForm}>Annuler</Button> 
             </form>
         </Fragment>
 

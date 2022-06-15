@@ -11,6 +11,7 @@ type NewConsultationProps = {
         patientId: number
     ) => void;
     patientId: number;
+    onClose: () => void
 };
 
 const NewConsultation =(props: NewConsultationProps) => {
@@ -37,38 +38,28 @@ const NewConsultation =(props: NewConsultationProps) => {
         props.onAddConsultation(enteredHeight, enteredWeight, enteredReport, props.patientId);
     }
 
+    const closeConsultationForm = () => {
+        props.onClose();
+    }
 
-
-    
     return(
         <Fragment>
             <h2>Créer une nouvelle consultation</h2>
             <form className={classes.form} onSubmit={submitHandler} >
-                {/* <div className={classes.group_name}> */}
-                    <div className={classes.bloc_label_input}>
-                        <label htmlFor='height'>Taille</label>
-                        <input type='number' id='height' ref={heightInputRef}/>
-                    </div>
-                    <div className={classes.bloc_label_input}>
-                        <label htmlFor='weight'>Poids</label>
-                        <input type='number' id='weight' ref={weightInputRef}/>
-                    </div>
-                    <div className={classes.bloc_label_input}>
-                        <label htmlFor='report'>Compte rendu</label>
-                        <textarea rows={3} id='report' ref={reportInputRef}/>
-                    </div>
-
-                    {/* <textarea
-        id={props.id}
-        rows={props.rows || 3}
-        onChange={changeHandler}
-        onBlur={touchHandler}
-        value={inputState.value}
-      />) */}
-                {/* </div> */}
-
-                
-                <Button type="submit">Créer</Button>  
+                <div className={classes.bloc_label_input}>
+                    <label htmlFor='height'>Taille</label>
+                    <input type='number' id='height' ref={heightInputRef}/>
+                </div>
+                <div className={classes.bloc_label_input}>
+                    <label htmlFor='weight'>Poids</label>
+                    <input type='number' id='weight' ref={weightInputRef}/>
+                </div>
+                <div className={classes.bloc_label_input}>
+                    <label htmlFor='report'>Compte rendu</label>
+                    <textarea rows={3} id='report' ref={reportInputRef}/>
+                </div>
+                <Button type="submit">Valider</Button>  
+                <Button type="button" onClick={closeConsultationForm}>Annuler</Button>
             </form>
         </Fragment>
 

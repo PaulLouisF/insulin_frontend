@@ -1,9 +1,10 @@
-import { Fragment, useState, useRef } from "react";
+import { Fragment, useState, useRef, useContext } from "react";
 
 import { useNavigate } from "react-router-dom";
 
 import Button from "../UI/Button";
 import { transformDateShortWithTime, calculateTimeInMinutes } from "../../util/function";
+import AuthContext from "../../store/auth-context";
 import { FaHospitalUser } from "react-icons/fa";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -15,7 +16,7 @@ import Modal from "../UI/Modal";
 
 interface ticketObject {
     ticket: {
-        id: string;
+        id: number;
         question: string;
         is_closed: boolean;
         created_at: string;
@@ -47,27 +48,29 @@ interface ticketObject {
             }
         }
     },
-    status: string
+    status: string,
+    //onCancel: (id: number) => void;
 }
 
 const TicketItem = (props: ticketObject) => {
     const { ticket, status } = props;
     const [error, setError] = useState<any>();
     let navigate = useNavigate();
+    const authCtx = useContext(AuthContext);
     const ticketAnswerRef = useRef<HTMLTextAreaElement>(null);
 
     const takeTicketHandler = async (event: React.FormEvent) => {
         event.preventDefault();
         //WARNING Set Parameter assignee in Ticket
         try {
-            const response = await fetch(`http://localhost:5000/api/tickets/assigned-ticket`, {
+            const response = await fetch(process.env.REACT_APP_BACKEND_URL + `/tickets/assigned-ticket`, {
                 method: 'POST',
                 body: JSON.stringify({
-                ticket_id: ticket.id,
-                user_id: 2,
+                    ticket_id: ticket.id,
                 }),
                 headers: {
-                'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + authCtx.token
                 }
             });
             const responseData = await response.json();
@@ -93,13 +96,18 @@ const TicketItem = (props: ticketObject) => {
         //WARNING Set Parameter assignee in Ticket
         try {
             const response = await fetch(
-              `http://localhost:5000/api/tickets/${ticket.TicketPile.id}`,
-              { method: 'DELETE' }
+                process.env.REACT_APP_BACKEND_URL + `/tickets/${ticket.TicketPile.id}`, { 
+                  method: 'DELETE',
+                  headers: {
+                    Authorization: 'Bearer ' + authCtx.token
+                  }
+                }
             );
             const responseData = await response.json();
             if (!response.ok) {
                 throw new Error(responseData.message);
             }  
+            //props.onCancel(ticket.id) 
         } catch (err: any) {
             setError(err.message)
         }
@@ -115,13 +123,14 @@ const TicketItem = (props: ticketObject) => {
                 throw new Error("Veuillez répondre à la question avant de valider la réponse au ticket. Vous devez au moins écrire 30 lettres");
             }
 
-            const response = await fetch(`http://localhost:5000/api/tickets/${ticket.id}`, {
+            const response = await fetch(process.env.REACT_APP_BACKEND_URL + `/tickets/${ticket.id}`, {
                 method: 'PATCH',
                 body: JSON.stringify({
                     answer: ticketAnswerRef.current!.value
                 }),
                 headers: {
-                'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + authCtx.token
                 }
             });
             const responseData = await response.json();
@@ -155,6 +164,9 @@ const TicketItem = (props: ticketObject) => {
                 <p>Question par {ticket.User.first_name} {ticket.User.last_name} : {ticket.question}</p>
             </div>     
             {(status === "handled") && <div className={classes.ticket_answer}>
+                <p>{`Reponse par ${ticket.Answer.User.first_name} ${ticket.Answer.User.last_name}: ${ticket.Answer.answer}`}</p>
+            </div>} 
+            {(status === "myOwnTickets" && ticket.Answer) && <div className={classes.ticket_answer}>
                 <p>{`Reponse par ${ticket.Answer.User.first_name} ${ticket.Answer.User.last_name}: ${ticket.Answer.answer}`}</p>
             </div>} 
             {(status === "underHandling") && <div className={classes.ticket_answer}>

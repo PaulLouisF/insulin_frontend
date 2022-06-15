@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
+import AuthContext from '../store/auth-context';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -76,29 +77,39 @@ ChartJS.register(
 
 
   export function MyIndicators() {
-    const [loadedData, setLoadedData] = useState<{date: string, value: number}[]>([])
-       useEffect(() => {
-        const fetchPatients = async () => {
-          try {
-            const responseData = await fetch(
-              `http://localhost:5000/api/patients/indicators`
-            );
-            const response = await responseData.json();
-            console.log(response)
-            setLoadedData(response.patientsIndicators);
-            // setLoadedPatients(response.patients);  
-          } catch (err) {}
-        };
-        fetchPatients();
-    }, []);
+    const [loadedData, setLoadedData] = useState<{date: string, valueM: number, valueW: number}[]>([])
+    const authCtx = useContext(AuthContext);
+    
+    useEffect(() => {
+      const fetchPatients = async () => {
+        try {
+          const responseData = await fetch(process.env.REACT_APP_BACKEND_URL + `/patients/indicators`, {
+            headers: {
+              Authorization: 'Bearer ' + authCtx.token
+            } 
+          }
+          );
+          const response = await responseData.json();
+          console.log(response)
+          setLoadedData(response.patientsIndicators);
+          // setLoadedPatients(response.patients);  
+        } catch (err) {}
+      };
+      fetchPatients();
+  }, []);
 
     const data = {
         labels: loadedData.map(data => data.date),
         datasets: [
           {
-            label: 'Nombre de patients',
-            data: loadedData.map(data => data.value),
+            label: 'Femmes',
+            data: loadedData.map(data => data.valueW),
             backgroundColor: 'rgba(255, 99, 132, 0.5)',
+          },
+          {
+            label: 'Hommes',
+            data: loadedData.map(data => data.valueM),
+            backgroundColor: 'blue',
           },
         ],
       };

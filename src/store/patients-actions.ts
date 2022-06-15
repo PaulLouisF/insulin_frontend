@@ -1,10 +1,14 @@
 import { replacePatients } from "./patients-slice";
 
-export const fetchPatientsData = ( enteredName: string ) => {
+
+export const fetchPatientsData = ( enteredName: string, token: string | null | undefined ) => {   
     return async (dispatch: (arg0: any) => void) => {
         const fetchData = async () => {
-            // const response = await fetch(`http://localhost:5000/api/patients`);
-            const response = await fetch(`http://localhost:5000/api/patients?myparam=${enteredName}`);
+            const response = await fetch(process.env.REACT_APP_BACKEND_URL + `/patients?myparam=${enteredName}`, { 
+                headers: {
+                    Authorization: 'Bearer ' + token
+                } 
+            });
             if (!response.ok) {
                 throw new Error('Could not fetch data');
             }

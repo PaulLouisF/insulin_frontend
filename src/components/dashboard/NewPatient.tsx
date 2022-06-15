@@ -9,8 +9,10 @@ type NewPatientProps = {
         firstName: string,
         lastName: string,
         isMan: boolean,
-        birthDate: Date
-    ) => void;
+        birthDate: Date,
+        event: React.FormEvent 
+    ) => void,
+    onClose: () => void
 };
 
 const NewPatient = (props: NewPatientProps) => {
@@ -19,11 +21,11 @@ const NewPatient = (props: NewPatientProps) => {
 
     const firstNameInputRef = useRef<HTMLInputElement>(null);
     const lastNameInputRef = useRef<HTMLInputElement>(null);
-    const sexInputRef = useRef<HTMLInputElement>(null);
-    const birthDateInputRef = useRef<HTMLInputElement>(null);
+    // const sexInputRef = useRef<HTMLInputElement>(null);
+    // const birthDateInputRef = useRef<HTMLInputElement>(null);
     
     const submitHandler = (event: React.FormEvent) => {
-        event.preventDefault();
+        //event.preventDefault();
 
         const enteredFirstName = firstNameInputRef.current!.value;
         const enteredLastName = lastNameInputRef.current!.value;
@@ -37,19 +39,16 @@ const NewPatient = (props: NewPatientProps) => {
         //     trhow an error
         //     return;            
         // }
-        console.log('ok');
-        console.log(enteredFirstName);
-        console.log(enteredLastName);
-        console.log(enteredIsMan);
-        console.log(enteredBirthDate);
-        props.onAddPatient(enteredFirstName, enteredLastName, enteredIsMan, enteredBirthDate);
+        props.onAddPatient(enteredFirstName, enteredLastName, enteredIsMan, enteredBirthDate, event);
+    }
+
+    const closePatientForm = () => {
+        props.onClose();
     }
 
     const sexChangeHandler = () => {
         setIsMan((prevIsMan) => { return !prevIsMan }); 
     }
-
-    console.log(isMan);
     
     return(
         <Fragment>
@@ -83,8 +82,8 @@ const NewPatient = (props: NewPatientProps) => {
                         Femme
                     </h3>
                 </div>
-                
-                <Button type="submit">Créer</Button>  
+                <Button type="submit">Valider</Button>  
+                <Button type="button" onClick={closePatientForm}>Annuler</Button> 
             </form>
         </Fragment>
 

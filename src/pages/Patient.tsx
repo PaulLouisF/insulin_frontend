@@ -1,13 +1,16 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useContext } from "react";
 
 import { Routes, Route, useParams, NavLink } from "react-router-dom";
 import Consultations from "../components/consultation/Consultations";
-import { MyChart } from "../components/patientData/patientData";
+import  MyChart from "../components/patientData/patientData";
+import AuthContext from "../store/auth-context";
 
 import classes from './Patient.module.css';
+import openSocket from 'socket.io-client';
 
 const Patient = () => {
     const { id } = useParams();
+    const authCtx = useContext(AuthContext);
     // const [patient, setPatient] = useState<PatientModel>();
     interface patientObject {
         id: number;
@@ -46,8 +49,11 @@ const Patient = () => {
     useEffect(() => { 
         try {
             const fetchPatientData = async () => {
-                // const response = await fetch(`http://localhost:5000/api/patients`);
-                const response = await fetch(`http://localhost:5000/api/patients/${id}`);
+                const response = await fetch(process.env.REACT_APP_BACKEND_URL + `/patients/${id}`, {
+                    headers: {
+                        Authorization: 'Bearer ' + authCtx.token
+                    } 
+                });
                 if (!response.ok) {
                     throw new Error('Could not fetch data');
                 }
@@ -60,10 +66,20 @@ const Patient = () => {
                 
             }
             fetchPatientData();
+
+            const socket = openSocket(`${process.env.REACT_APP_OPENSOCKET}`);
+       
+            socket.on('consultations', data => {
+                if (data.action === 'create') {
+                    fetchPatientData();
+                }
+            })
         } catch (error) {
             //Handle error
         }       
     }, [id]);
+
+    
 
     // WARNING put the function in separate file and use useMemo
     const calculateAge = (birth_date: string) => {
@@ -99,7 +115,7 @@ const Patient = () => {
                         <nav className={classes.nav}>
                         <ul>
                             <li><NavLink to={`/patients/${id}/consultations`} className={navData => navData.isActive ? classes.active : '' }>Consultations</NavLink></li>
-                            <li><NavLink to={`/patients/${id}/glycemies`} className={navData => navData.isActive ? classes.active : '' }>Glycémies</NavLink></li>
+                            <li><NavLink to={`/patients/${id}/data`} className={navData => navData.isActive ? classes.active : '' }>Data</NavLink></li>
                             <li><NavLink to='/traitements' className={navData => navData.isActive ? classes.active : '' }>Traitements</NavLink></li>
                         </ul>
                     </nav>
@@ -108,7 +124,7 @@ const Patient = () => {
                     <Routes>
                         <Route path="consultations" element={<Consultations patient={patient} />} />
                         {/* <Route path="glycemies" element={<h2>Pas de glycémie pour ce patient</h2>} /> */}
-                        <Route path="glycemies" element={<MyChart />} />
+                        <Route path="data" element={<MyChart patient={patient}/>} />
                     </Routes>
                     
                     {/* <Consultations patient={patient} /> */}
