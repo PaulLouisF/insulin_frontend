@@ -1,12 +1,17 @@
-import { Fragment, useEffect, useState, useContext } from "react";
+import React, { Fragment, useEffect, useState, useContext } from "react";
 
 import { Routes, Route, useParams, NavLink } from "react-router-dom";
 import Consultations from "../components/consultation/Consultations";
-import  MyChart from "../components/patientData/patientData";
+
+import socket from "../store/socket";
+
 import AuthContext from "../store/auth-context";
 
 import classes from './Patient.module.css';
-import openSocket from 'socket.io-client';
+
+const MyChart = React.lazy(() => import('../components/patientData/patientData'));
+const Treatment = React.lazy(() => import('../components/treatment/Treatment'));
+//import openSocket from 'socket.io-client';
 
 const Patient = () => {
     const { id } = useParams();
@@ -67,13 +72,16 @@ const Patient = () => {
             }
             fetchPatientData();
 
-            const socket = openSocket(`${process.env.REACT_APP_OPENSOCKET}`);
-       
             socket.on('consultations', data => {
                 if (data.action === 'create') {
                     fetchPatientData();
                 }
             })
+
+            return () => {
+                socket.off('consultations');
+            }
+
         } catch (error) {
             //Handle error
         }       
@@ -116,7 +124,7 @@ const Patient = () => {
                         <ul>
                             <li><NavLink to={`/patients/${id}/consultations`} className={navData => navData.isActive ? classes.active : '' }>Consultations</NavLink></li>
                             <li><NavLink to={`/patients/${id}/data`} className={navData => navData.isActive ? classes.active : '' }>Data</NavLink></li>
-                            <li><NavLink to='/traitements' className={navData => navData.isActive ? classes.active : '' }>Traitements</NavLink></li>
+                            <li><NavLink to={`/patients/${id}/traitements`} className={navData => navData.isActive ? classes.active : '' }>Traitements</NavLink></li>
                         </ul>
                     </nav>
                     </div>
@@ -125,6 +133,8 @@ const Patient = () => {
                         <Route path="consultations" element={<Consultations patient={patient} />} />
                         {/* <Route path="glycemies" element={<h2>Pas de glycémie pour ce patient</h2>} /> */}
                         <Route path="data" element={<MyChart patient={patient}/>} />
+                        <Route path="traitements" element={<Treatment/>} />
+                 
                     </Routes>
                     
                     {/* <Consultations patient={patient} /> */}

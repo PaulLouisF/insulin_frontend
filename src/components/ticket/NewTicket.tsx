@@ -31,10 +31,12 @@ const NewTicket =(props: NewTicketProps) => {
             <form className={classes.form} onSubmit={submitHandler} >
                 <div className={classes.bloc_label_input}>
                     <label htmlFor='question'>Question</label>
-                    <textarea rows={3} id='question' ref={questionInputRef}/>
-                </div>                
-                <Button type="submit">Valider</Button> 
-                <Button type="button" onClick={closeTicketForm}>Annuler</Button> 
+                    <textarea rows={5} id='question' ref={questionInputRef}/>
+                </div>  
+                <div className={classes.bloc_button}>            
+                    <Button type="submit">Valider</Button> 
+                    <Button type="button" onClick={closeTicketForm}>Annuler</Button> 
+                </div>  
             </form>
         </Fragment>
 

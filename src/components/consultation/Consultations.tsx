@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useLayoutEffect, useState } from "react";
 
 import ConsultationBox from "./ConsultationBox";
 import NewConsultation from "./NewConsultation";
@@ -12,6 +12,7 @@ import { solid, regular } from '@fortawesome/fontawesome-svg-core/import.macro'
 import AuthContext from "../../store/auth-context";
 
 import classes from './Consultations.module.css';
+import { useLocation } from "react-router-dom";
 
 
 interface patientObject {
@@ -57,21 +58,35 @@ const Consultations = (props: patientObject) => { //WARNING sur any
     
     const consultations = props.patient.Consultations.sort(function(a, b) {return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();});
 
-    let lastConsultation = <h3>Aucune consultation pour ce patient</h3>
 
-    // let lastConsultationId = null;
-    // const [activeButtonId, setActiveButtonId] = useState<null | number>(lastConsultationId)
+    interface stateType {
+      state: { consultationId: number } 
+   }
+    let location = useLocation() as unknown as stateType; //WARNING  
+    
+    
     const [activeButtonId, setActiveButtonId] = useState<null | number>(null);
 
     useEffect(() => {
+      
       if(consultations.length > 0) {
-        const timeLastConsultation = (new Date(Date.now()).setHours(0, 0, 0, 0) - new Date(consultations[0].created_at).setHours(0, 0, 0, 0))/(1000* 60 * 60*24)
-        lastConsultation = <h3>La dernière consultation a eu lieu il y a {timeLastConsultation} jours</h3>
         const lastConsultationId = consultations[0]!.id;
-        setActiveButtonId(lastConsultationId);
+        let selectedConsultationId = location.state?.consultationId || lastConsultationId; 
+        setActiveButtonId(selectedConsultationId);
+        handleClick(selectedConsultationId)
       } 
     }, [props])
+
+
+    let lastConsultation;
+    if (consultations.length > 0) {
+      const timeLastConsultation = (new Date(Date.now()).setHours(0, 0, 0, 0) - new Date(consultations[0].created_at).setHours(0, 0, 0, 0))/(1000* 60 * 60*24)
+      lastConsultation = <h3>La dernière consultation a eu lieu il y a {timeLastConsultation} jours</h3>
+    } else {
+      lastConsultation = <h3>Aucune consultation pour ce patient</h3>
+    }
    
+ 
     const createConsultationHandler = () => {
         setIsCreateConsultation(true);
     };
@@ -154,10 +169,24 @@ const Consultations = (props: patientObject) => { //WARNING sur any
       const arrayConsultationId = consultations.map(consultation => consultation.id)
 
       const handleClick = (id: number) => {
+        console.log(refs[id])
         refs[id].current.scrollIntoView({
           behavior: 'smooth',
-          block: 'start',
+          block: 'start' ,
         });
+        console.log(refs[id])
+        //    refs[id].current.scroll({
+        //   behavior: 'smooth',
+        //   block: 'start' ,
+        //   //top: 1000
+        // });
+
+        // refs[id].current.scrollIntoView({
+        //   behavior: 'smooth',
+        //   block: 'start' ,
+        // });
+
+        
         // console.log(refs[id].current.offsetTop)
         setActiveButtonId((prevState) => {return id});
         console.log(activeButtonId)
@@ -205,10 +234,10 @@ const Consultations = (props: patientObject) => { //WARNING sur any
     // }, []);
     
     const scrollHandler = () => {
-        console.log(arrayConsultationId)
-        console.log(activeButtonId)
-        console.log(window.scrollY)
-        console.log(window.innerHeight)
+        // console.log(arrayConsultationId)
+        // console.log(activeButtonId)
+        // console.log(window.scrollY)
+        // console.log(window.innerHeight)
         // console.log(refs[2].current)
         // for(var i=0; i<consultations.length; i++) {
         //   console.log(refs[consultations[i].id].current.offsetTop)
@@ -256,6 +285,10 @@ const Consultations = (props: patientObject) => { //WARNING sur any
           <div className={classes.consultation_create}>
             {/* <h3>La dernière consultation a eu lieu il y a {timeLastConsultation} jours</h3> */}
             {lastConsultation}
+            {/* {consultations.length > 0 ? <h3>La dernière consultation a eu lieu il y a {timeLastConsultation} jours</h3> : <h3>Aucune consultation pour ce patient</h3> }
+        */}
+
+
             <Button onClick={createConsultationHandler}>Nouvelle consultation</Button>
           </div>
           <div className={classes.consultations_container}>
@@ -305,15 +338,15 @@ const Consultations = (props: patientObject) => { //WARNING sur any
                 </ConsultationBox>
                 {consultation.Ticket &&
                   <ConsultationBox title='AVIS D UN SPECIALISTE'>
-                    <p>Question : {consultation.Ticket.question}</p>
+                    <p><FontAwesomeIcon icon={solid('question')} /> Question : {consultation.Ticket.question}</p>
                     {consultation.Ticket.Answer &&
-                      <p>Réponse par {consultation.Ticket.Answer.User.first_name} {consultation.Ticket.Answer.User.last_name} : {consultation.Ticket.Answer.answer}</p>
+                      <p><FontAwesomeIcon icon={solid('reply')} /> Réponse par {consultation.Ticket.Answer.User.first_name} {consultation.Ticket.Answer.User.last_name} : {consultation.Ticket.Answer.answer}</p>
                     }
                     </ConsultationBox>
                 }
                 {
                   !consultation.Ticket && 
-                  <div>
+                  <div className={classes.bloc_button}>
                     <Button type="button" onClick={() => createTicketHandler(consultation.id)}>Demander l'avis d un specialiste</Button>
                   </div> 
                 }

@@ -25,3 +25,14 @@
     font-weight: 700;
     font-size: 1.25rem;
 }
+
+.bloc_button {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.bloc_button Button {
+    width: 48%;
+}
+

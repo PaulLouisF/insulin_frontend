@@ -7,7 +7,11 @@ type AuthContextObj = {
     userId: number | null | undefined,
     isLoggedIn: boolean,
     login: (token: string, expirationTime: string, userId: number) => void,
-    logout: () => void
+    logout: () => void,
+    isWantAuth: boolean,
+    showConnectForm: () => void,
+    hideConnectForm: () => void,
+    
 }
 
 const AuthContext = React.createContext<AuthContextObj>({
@@ -15,7 +19,10 @@ const AuthContext = React.createContext<AuthContextObj>({
     userId: null,
     isLoggedIn: false,
     login: (token) => {},
-    logout: () => {}
+    logout: () => {},
+    isWantAuth: false,
+    showConnectForm: () => {},
+    hideConnectForm: () => {},
 });
 
 const calculateRemainingTime = (expirationTime: string ) => {
@@ -30,7 +37,7 @@ const calculateRemainingTime = (expirationTime: string ) => {
 const retrieveStoredToken = () => {
   const storedToken = localStorage.getItem('token');
   const storedExpirationDate = localStorage.getItem('expirationTime');
-  const userId = localStorage.getItem('userId');
+  const storedUserId = localStorage.getItem('userId');
 
   let remainingTime = 0;
   if (storedExpirationDate) {
@@ -48,7 +55,7 @@ const retrieveStoredToken = () => {
   return {
     token: storedToken,
     duration: remainingTime,
-    userId: userId
+    userId: storedUserId
   };
 };
 
@@ -67,6 +74,7 @@ export const AuthContextProvider = (props: { children: any }) => {
 
   const [token, setToken] = useState(initialToken); 
   const [userId, setUserId] = useState<number | null | undefined>(initialUserId); 
+  const [isWantAuth, setIsWantAuth] = useState<boolean>(false)
 
   const userIsLoggedIn = !!token;
 
@@ -84,6 +92,8 @@ export const AuthContextProvider = (props: { children: any }) => {
 
   const loginHandler = (token: string, expirationTime: string, userId: number) => {
     setToken(token);
+    setUserId(userId)
+    setIsWantAuth(false);
     localStorage.setItem('token', token);
     localStorage.setItem('expirationTime', expirationTime);
     localStorage.setItem('userId', userId.toString());
@@ -92,6 +102,14 @@ export const AuthContextProvider = (props: { children: any }) => {
 
     logoutTimer = setTimeout(logoutHandler, remainingTime);
   };
+
+  const showConnectFormHandler = () => {
+    setIsWantAuth(true);
+  }
+
+  const hideConnectFormHandler = () => {
+    setIsWantAuth(false);
+  }
 
   useEffect(() => { 
     if (tokenData) {
@@ -106,6 +124,9 @@ export const AuthContextProvider = (props: { children: any }) => {
     isLoggedIn: userIsLoggedIn,
     login: loginHandler,
     logout: logoutHandler,
+    isWantAuth: isWantAuth,
+    showConnectForm: showConnectFormHandler,
+    hideConnectForm: hideConnectFormHandler
   };
 
   return (

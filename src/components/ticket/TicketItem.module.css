@@ -42,3 +42,8 @@
     padding: 0 10px
 }
 
+.ticket_answer_form_button Button {
+    margin: 10px 0px;
+    width: 100%
+}
+

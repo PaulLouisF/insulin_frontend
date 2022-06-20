@@ -58,8 +58,10 @@ const NewConsultation =(props: NewConsultationProps) => {
                     <label htmlFor='report'>Compte rendu</label>
                     <textarea rows={3} id='report' ref={reportInputRef}/>
                 </div>
-                <Button type="submit">Valider</Button>  
-                <Button type="button" onClick={closeConsultationForm}>Annuler</Button>
+                <div className={classes.bloc_button}>
+                    <Button type="submit">Valider</Button>  
+                    <Button type="button" onClick={closeConsultationForm}>Annuler</Button>
+                </div>
             </form>
         </Fragment>
 

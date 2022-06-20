@@ -82,8 +82,10 @@ const NewPatient = (props: NewPatientProps) => {
                         Femme
                     </h3>
                 </div>
+                <div className={classes.bloc_button}>
                 <Button type="submit">Valider</Button>  
                 <Button type="button" onClick={closePatientForm}>Annuler</Button> 
+                </div>
             </form>
         </Fragment>
 

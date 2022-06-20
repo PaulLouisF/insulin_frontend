@@ -15,16 +15,22 @@
 
 .consultation_container_index {
   position: sticky;
-  top: 10px
+  top: 100px;
 }
 
 .consultation_container {
-    padding: 0 10px 0px 10px;
+    padding: 0 10px 15px 10px;
     border: 1px solid #808080;
     border-radius: 10px;
     /* box-shadow: 3px 3px 2px #008080; */
     box-shadow: 0px 0px 10px grey;
     margin-bottom: 15px;
+    top: 100px;
+    position: sticky
+    /* position: absolute;
+    bottom: -50px;
+
+    z-index: 5 */
 }
 
 .consultation_container_banner {
@@ -105,3 +111,7 @@ ul {
     outline: none;
     color: blue
   }  */
+
+  .bloc_button Button {
+    width: 100%
+  }

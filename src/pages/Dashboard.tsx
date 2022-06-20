@@ -74,7 +74,7 @@ const Dashboard = () => {
                 <Button onClick={reinitialiseFilterHandler}>Effacer le filtre</Button>
               </div>
       
-                <Button onClick={createPatientHandler}>+Créer un patient</Button>
+                <Button onClick={createPatientHandler}>Créer un patient</Button>
             </div>
             {/* <PatientsList patients={loadedPatients}/> */}
             <PatientsList />

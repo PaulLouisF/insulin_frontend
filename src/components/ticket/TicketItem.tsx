@@ -1,6 +1,6 @@
 import { Fragment, useState, useRef, useContext } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import Button from "../UI/Button";
 import { transformDateShortWithTime, calculateTimeInMinutes } from "../../util/function";
@@ -79,7 +79,8 @@ const TicketItem = (props: ticketObject) => {
                 // throw new Error('Something went wrong');
                 throw new Error(responseData.message);
             }
-            navigate(`/patients/${ticket.Consultation.patient_id}}/consultations`, { replace: true });
+            navigate(`/patients/${ticket.Consultation.patient_id}}/consultations`, {state: { consultationId: ticket.consultation_id }});
+            //navigate(`/patients/${ticket.Consultation.patient_id}}/consultations`, { replace: true });
         } catch (err:any) {
             // throw err;
             setError(err.message)
@@ -88,7 +89,8 @@ const TicketItem = (props: ticketObject) => {
 
     const viewPatientFile = async (event: React.FormEvent) => {
         event.preventDefault();
-        navigate(`/patients/${ticket.Consultation.patient_id}}/consultations`);
+        navigate(`/patients/${ticket.Consultation.patient_id}}/consultations`, {state: { consultationId: ticket.consultation_id }});
+        //<Navigate to="/patients/${ticket.Consultation.patient_id}}/consultations" state={{ consultationId: ticket.consultation_id }} replace />; 
     };
 
     const cancelTicketHandler = async (event: React.FormEvent) => {
@@ -171,10 +173,10 @@ const TicketItem = (props: ticketObject) => {
             </div>} 
             {(status === "underHandling") && <div className={classes.ticket_answer}>
                 <form className={classes.ticket_answer_form} onSubmit={answerTicketHandler} >
-                    <textarea rows={4} id='reponse' ref={ticketAnswerRef}/>
-                    <div>
-                        <Button type="submit">Repondre</Button>
+                    <textarea rows={5} id='reponse' ref={ticketAnswerRef}/>
+                    <div className={classes.ticket_answer_form_button}>
                         <Button onClick={viewPatientFile}>Voir dossier patient</Button>
+                        <Button type="submit">Repondre</Button>
                     </div>
                 </form>
             </div>}    

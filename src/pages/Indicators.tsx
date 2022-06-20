@@ -76,7 +76,7 @@ ChartJS.register(
   
 
 
-  export function MyIndicators() {
+function MyIndicators() {
     const [loadedData, setLoadedData] = useState<{date: string, valueM: number, valueW: number}[]>([])
     const authCtx = useContext(AuthContext);
     
@@ -116,4 +116,6 @@ ChartJS.register(
 
     return <Bar options={options} data={data} />;
   }
+
+  export default MyIndicators;
   

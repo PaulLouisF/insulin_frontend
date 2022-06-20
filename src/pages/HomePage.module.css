@@ -1,0 +1,12 @@
+.container {
+    display: flex
+}
+
+
+.image {
+    width: 75%
+}
+
+.center_text {
+    margin: auto
+}
