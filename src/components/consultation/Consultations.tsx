@@ -71,9 +71,10 @@ const Consultations = (props: patientObject) => { //WARNING sur any
       
       if(consultations.length > 0) {
         const lastConsultationId = consultations[0]!.id;
-        let selectedConsultationId = location.state?.consultationId || lastConsultationId; 
-        setActiveButtonId(selectedConsultationId);
-        handleClick(selectedConsultationId)
+        // let selectedConsultationId = location.state?.consultationId || lastConsultationId; 
+        // setActiveButtonId(selectedConsultationId);
+        // handleClick(selectedConsultationId)
+        setActiveButtonId(lastConsultationId)
       } 
     }, [props])
 
