@@ -41,7 +41,8 @@ const Patient = () => {
                     answer: string;
                     User: {
                       first_name: string;
-                      last_name: string
+                      last_name: string;
+                      is_doctor: boolean
                     }
                   }
             }
@@ -91,7 +92,6 @@ const Patient = () => {
 
     // WARNING put the function in separate file and use useMemo
     const calculateAge = (birth_date: string) => {
-        console.log(birth_date)
         const today = new Date();
         const birthDate = new Date(birth_date);
         let age = today.getFullYear() - birthDate.getFullYear();

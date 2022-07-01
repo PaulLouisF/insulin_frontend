@@ -8,7 +8,6 @@ import socket from "../store/socket";
 
 import classes from './Tickets.module.css'; 
 import Modal from "../components/UI/Modal";
-import { IoNotificationsCircleOutline } from "react-icons/io5";
 
 const Tickets = () => {
     interface ticketObject {
@@ -50,7 +49,7 @@ const Tickets = () => {
     const authCtx = useContext(AuthContext);
     const [error, setError] = useState<any>();
     const [activeButtonId, setActiveButtonId] = useState<number>(1);
-    const [activeButton, setActiveButton] = useState<number>(1);
+    const [activeButtonTickets, setActiveButtonTickets] = useState<boolean>(true);
     const [tickets, setTickets] = useState<ticketObject[]>([]);
 
     useEffect(() => { 
@@ -70,10 +69,6 @@ const Tickets = () => {
                 
                 const loadedTickets = responseData.tickets;
                 setTickets(loadedTickets);
-            
-                // setTickets(() => {
-                //     return loadedTickets.filter((ticket: { user_id: number }) => ticket.user_id === authCtx.userId)
-                // });
             }
             fetchTicketsData(); 
 
@@ -114,7 +109,7 @@ const Tickets = () => {
     let noTicketsNotHandledMessage;
 
 
-    if (activeButton === 1) {
+    if (activeButtonTickets === true) {
         //myTickets = tickets.filter((ticket: { user_id: number }) => ticket.user_id === authCtx.userId)
         ticketsUnderHandling = tickets.filter((ticket: { TicketPile: { user_id: number }; user_id: number}) => ticket.TicketPile && ticket.TicketPile.user_id === authCtx.userId && ticket.user_id != authCtx.userId);
         ticketsHandled = tickets.filter((ticket: { is_closed: boolean; Answer: { user_id: number} }) => ticket.is_closed === true && ticket.Answer && ticket.Answer.user_id === authCtx.userId);
@@ -124,12 +119,12 @@ const Tickets = () => {
         // noTicketsNotHandledMessage;
     
     }
-    if (activeButton === 2) {
+    if (activeButtonTickets === false) {
         //myTickets = tickets.filter((ticket: { user_id: number }) => ticket.user_id === authCtx.userId)
         ticketsUnderHandling = tickets.filter((ticket: { TicketPile: { user_id: number }; user_id: number}) => ticket.TicketPile && ticket.user_id === authCtx.userId);
         ticketsHandled = tickets.filter((ticket: { Answer: any; user_id: number }) => ticket.user_id === authCtx.userId && ticket.Answer);
         ticketsNotHandled =  tickets.filter((ticket: { TicketPile: any; Answer: any; user_id: number }) => !ticket.TicketPile && !ticket.Answer && ticket.user_id === authCtx.userId);
-        noTicketsUnderHandlingMessage = <h2>Vous n'avez aucun question non répondue en cours de traitement</h2>;
+        noTicketsUnderHandlingMessage = <h2>Vous n'avez aucune question non répondue en cours de traitement</h2>;
     }
 
 
@@ -148,14 +143,14 @@ const Tickets = () => {
             <div className={classes.ticket_menu}>
                 {/* <h2>Tickets</h2> */}
                 <div>
-                <button className={`${classes.tickets_menu_button} ${1 === activeButton ? classes.active : ''}`} type="button" onClick={() => setActiveButton(1)}>Mes tickets</button>
-                <button className={`${classes.tickets_menu_button} ${2 === activeButton ? classes.active : ''}`} type="button" onClick={() => setActiveButton(2)}>Mes questions</button>
+                <button className={`${classes.tickets_menu_button} ${true === activeButtonTickets ? classes.active : ''}`} type="button" onClick={() => setActiveButtonTickets(true)}>Mes tickets</button>
+                <button className={`${classes.tickets_menu_button} ${false === activeButtonTickets ? classes.active : ''}`} type="button" onClick={() => setActiveButtonTickets(false)}>Mes questions</button>
 
                 </div>
                 <div className={classes.tickets_menu_buttons}>
                     <button className={`${classes.tickets_menu_button} ${1 === activeButtonId ? classes.active : ''}`} type="button" onClick={() => setActiveButtonId(1)}>En cours ({ticketsUnderHandling.length})</button>
                     <button className={`${classes.tickets_menu_button} ${2 === activeButtonId ? classes.active : ''}`} type="button" onClick={() => setActiveButtonId(2)}>En attente ({ticketsNotHandled.length})</button>
-                    <button className={`${classes.tickets_menu_button} ${3 === activeButtonId ? classes.active : ''}`} type="button" onClick={() => setActiveButtonId(3)}>{activeButton === 1 ? "Traités": "Traitées" }({ticketsHandled.length})</button>
+                    <button className={`${classes.tickets_menu_button} ${3 === activeButtonId ? classes.active : ''}`} type="button" onClick={() => setActiveButtonId(3)}>{activeButtonTickets === true ? "Traités": "Traitées" }({ticketsHandled.length})</button>
                     {/* <button className={`${classes.tickets_menu_button} ${4 === activeButtonId ? classes.active : ''}`} type="button" onClick={() => setActiveButtonId(4)}>Mes questions ({myTickets.length})</button> */}
                 </div>
             </div>
@@ -163,7 +158,7 @@ const Tickets = () => {
             { activeButtonId === 1 && 
                 <div>
                     {ticketsUnderHandling.length > 0 ? ticketsUnderHandling.map(ticket => {
-                    return <TicketItem ticket={ticket} key={ticket.id} status={"underHandling"} /> 
+                    return <TicketItem ticket={ticket} key={ticket.id} status={"underHandling"} isTicketButtonActive={activeButtonTickets}/> 
                 })
                     : noTicketsUnderHandlingMessage}
                     {/* <h2>Vous n'avez aucun ticket en cours</h2>} */}
@@ -175,7 +170,7 @@ const Tickets = () => {
                 <div>
                     
                 {ticketsNotHandled.length > 0 ? ticketsNotHandled.map(ticket => {
-                return <TicketItem ticket={ticket} key={ticket.id} status={"notHandled"} /> 
+                return <TicketItem ticket={ticket} key={ticket.id} status={"notHandled"} isTicketButtonActive={activeButtonTickets}/> 
             })
                 : <h2>Il n'y a pas de ticket en attente</h2>}
             </div>
@@ -186,7 +181,7 @@ const Tickets = () => {
             { activeButtonId === 3 && 
                 <div>
                     {ticketsHandled.length > 0 ? ticketsHandled.map(ticket => {
-                    return <TicketItem ticket={ticket} key={ticket.id} status={"handled"} /> 
+                    return <TicketItem ticket={ticket} key={ticket.id} status={"handled"} isTicketButtonActive={activeButtonTickets}/> 
                 })
                     : <h2>Vous n'avez répondu à aucun ticket</h2>}
                 </div>

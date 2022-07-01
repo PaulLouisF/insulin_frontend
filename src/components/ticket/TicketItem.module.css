@@ -2,7 +2,7 @@
     border: 1px solid black;
     border-radius: 10px;
     padding: 0 0 10px 0px;
-    margin: 20px 0px
+    margin: 20px 0px;
 }
 
 .ticket_item_header {
@@ -22,8 +22,18 @@
     margin: auto 0px
 }
 
-.ticket_question {
-    padding: 0px 10px
+.ticket_question_answer {
+    padding: 0px 10px;
+    font-size: 1.10rem;
+}
+
+/* .ticket_question {
+    padding: 0px 10px;
+    font-size: 1.10rem;
+} */
+
+.ticket_answer{
+    padding: 0 10px;
 }
 
 .ticket_answer_form{
@@ -38,12 +48,14 @@
     font-size: 1.25rem;
 }
 
-.ticket_answer{
-    padding: 0 10px
-}
+
 
 .ticket_answer_form_button Button {
     margin: 10px 0px;
     width: 100%
+}
+
+.center {
+    text-align: center;
 }
 

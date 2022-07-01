@@ -40,7 +40,8 @@ interface patientObject {
             answer: string;
             User: {
               first_name: string;
-              last_name: string
+              last_name: string;
+              is_doctor: boolean;
             }
           }
         }
@@ -341,14 +342,18 @@ const Consultations = (props: patientObject) => { //WARNING sur any
                   <ConsultationBox title='AVIS D UN SPECIALISTE'>
                     <p><FontAwesomeIcon icon={solid('question')} /> Question : {consultation.Ticket.question}</p>
                     {consultation.Ticket.Answer &&
-                      <p><FontAwesomeIcon icon={solid('reply')} /> Réponse par {consultation.Ticket.Answer.User.first_name} {consultation.Ticket.Answer.User.last_name} : {consultation.Ticket.Answer.answer}</p>
+                      <p><FontAwesomeIcon icon={solid('user-doctor')} /> Réponse de {consultation.User.is_doctor ? 'Dr' : ''} {consultation.Ticket.Answer.User.first_name} {consultation.Ticket.Answer.User.last_name} : {consultation.Ticket.Answer.answer}</p>
                     }
                     </ConsultationBox>
                 }
                 {
                   !consultation.Ticket && 
                   <div className={classes.bloc_button}>
-                    <Button type="button" onClick={() => createTicketHandler(consultation.id)}>Demander l'avis d un specialiste</Button>
+                    <Button type="button" onClick={() => createTicketHandler(consultation.id)}>
+                      <div className={classes.button_ticket_text} >Demander l'avis d un specialiste</div>
+                      <div className={classes.button_ticket_icon}><FontAwesomeIcon className={classes.button_ticket_icon} icon={solid('user-doctor')} /></div>
+                      
+                    </Button>
                   </div> 
                 }
                 

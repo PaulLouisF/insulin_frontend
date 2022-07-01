@@ -44,16 +44,18 @@ interface ticketObject {
             answer: string;
             User: {
                 first_name: string;
-                last_name: string
+                last_name: string;
+                is_doctor: boolean;
             }
         }
     },
     status: string,
+    isTicketButtonActive: boolean
     //onCancel: (id: number) => void;
 }
 
 const TicketItem = (props: ticketObject) => {
-    const { ticket, status } = props;
+    const { ticket, status, isTicketButtonActive } = props;
     const [error, setError] = useState<any>();
     let navigate = useNavigate();
     const authCtx = useContext(AuthContext);
@@ -157,29 +159,37 @@ const TicketItem = (props: ticketObject) => {
                     <h4> Centre hospitalier de Nosy Be</h4>
                 </div>
                 
-                <h4><FontAwesomeIcon icon={solid('clock')} size={"lg"} /> {`le ${transformDateShortWithTime(ticket.created_at)} (${calculateTimeInMinutes(ticket.created_at)} min)`}</h4>
-                {(status === "underHandling") && <Button onClick={cancelTicketHandler}>Annuler le ticket</Button>}
+                <h4><FontAwesomeIcon icon={solid('clock')} size={"lg"} /> {` le ${transformDateShortWithTime(ticket.created_at)} ${status === "handled" ? "" : `(${calculateTimeInMinutes(ticket.created_at)} min)`}`}</h4>
+                {(status === "underHandling" && isTicketButtonActive) && <Button onClick={cancelTicketHandler}>Annuler le ticket</Button>}
                 {(status === "handled") && <Button onClick={viewPatientFile}>Voir dossier patient</Button>}
-                {(status === "notHandled") && <Button onClick={takeTicketHandler}>Prendre le ticket</Button>}
+                {(status === "notHandled" && isTicketButtonActive) && <Button onClick={takeTicketHandler}>Prendre le ticket</Button>}
             </div>
-            <div className={classes.ticket_question}>
-                <p>Question par {ticket.User.first_name} {ticket.User.last_name} : {ticket.question}</p>
+            <div className={classes.ticket_question_answer}>
+                <p><FontAwesomeIcon icon={solid('question')} /> Question de {ticket.User.first_name} {ticket.User.last_name} : {ticket.question}</p>
             </div>     
-            {(status === "handled") && <div className={classes.ticket_answer}>
-                <p>{`Reponse par ${ticket.Answer.User.first_name} ${ticket.Answer.User.last_name}: ${ticket.Answer.answer}`}</p>
+            {(status === "handled") && <div className={classes.ticket_question_answer}>
+                <p><FontAwesomeIcon icon={solid('user-doctor')} /> {`Réponse de ${ticket.Answer.User.is_doctor ? "Dr" : ""} ${ticket.Answer.User.first_name} ${ticket.Answer.User.last_name} : ${ticket.Answer.answer}`}</p>
             </div>} 
-            {(status === "myOwnTickets" && ticket.Answer) && <div className={classes.ticket_answer}>
+            {/* {(status === "myOwnTickets" && ticket.Answer) && <div className={classes.ticket_answer}>
                 <p>{`Reponse par ${ticket.Answer.User.first_name} ${ticket.Answer.User.last_name}: ${ticket.Answer.answer}`}</p>
-            </div>} 
-            {(status === "underHandling") && <div className={classes.ticket_answer}>
-                <form className={classes.ticket_answer_form} onSubmit={answerTicketHandler} >
-                    <textarea rows={5} id='reponse' ref={ticketAnswerRef}/>
-                    <div className={classes.ticket_answer_form_button}>
-                        <Button onClick={viewPatientFile}>Voir dossier patient</Button>
-                        <Button type="submit">Repondre</Button>
-                    </div>
-                </form>
-            </div>}    
+            </div>}  */}
+            {(status === "underHandling") && 
+                (isTicketButtonActive? 
+                    <div className={classes.ticket_answer}>
+                        <form className={classes.ticket_answer_form} onSubmit={answerTicketHandler} >
+                            <textarea rows={4} id='reponse' ref={ticketAnswerRef}/>
+                            <div className={classes.ticket_answer_form_button}>
+                                <Button onClick={viewPatientFile}>Voir dossier patient</Button>
+                                <Button type="submit">Repondre</Button>
+                            </div>
+                        </form>
+                    </div> 
+                    : 
+                    <div className={classes.center}>
+                        <p><b>Le ticket est en cours de traitement par {ticket.TicketPile.User.first_name} {ticket.TicketPile.User.last_name}. Vous recevrez prochainement une réponse</b></p>
+                    </div> 
+                )  
+            }    
         </div>
         </Fragment>
     );
